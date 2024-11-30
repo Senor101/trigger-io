@@ -1,6 +1,8 @@
 
-CREATE OR REPLACE FUNCTION notify_changes()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION public.notify_changes()
+  RETURNS TRIGGER 
+  LANGUAGE plpgsql
+AS $FUNCTION$
 DECLARE
   payload JSON;
 BEGIN
@@ -20,8 +22,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
-
+$FUNCTION$
 
 -- CREATE TRIGGER table_change_trigger
 -- AFTER INSERT OR UPDATE OR DELETE ON 
@@ -34,9 +35,15 @@ DO $$
       SELECT tablename FROM pg_tables
       WHERE schemaname = 'public'
     LOOP
+    -- Drop trigger if it already exists to avoid conflicts
+    EXECUTE format(
+      'DROP TRIGGER IF EXISTS %I_change_trigger ON %I',
+      table_rec.tablename, table_rec.tablename
+    );
+
       EXECUTE format(
         'CREATE TRIGGER %I_change_trigger
-        AFTER INSERT OR UDPATE OR DELETE ON %I
+        AFTER INSERT OR UPDATE OR DELETE ON %I
         FOR EACH ROW
         EXECUTE FUNCTION notify_changes()',
         table_rec.tablename, table_rec.tablename
