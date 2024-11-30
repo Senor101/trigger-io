@@ -37,5 +37,6 @@ model Blog {
   author User   @relation(fields: [userId], references: [id])
   userId String
 
+  @@unique([title, userId])
   @@map("blog")
 }
