@@ -19,9 +19,9 @@ const client = new Client({
 //   console.log(`${socket.id} connected.`);
 // });
 //
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-//
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+
 server.listen(PORT, async function () {
   try {
     await client.connect();
