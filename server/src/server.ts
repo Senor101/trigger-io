@@ -30,13 +30,10 @@ server.listen(PORT, async function () {
     await client.connect();
 
     const query = await client.query('LISTEN new_event');
-    console.log(`LISTEN changes ${JSON.stringify(query)}`);
-    const det = await client.query(`SELECT * from "User";`);
-    console.log(`Executing raw query! ${det.rows.at(1)}`);
+
     client.on('notification', function (msg) {
       console.log(`Notificaiton incoming, ${msg}`);
       const payload = JSON.parse(msg.payload ?? '');
-      console.log(payload);
     });
 
     console.log(`Server running on port: ${PORT}`);
