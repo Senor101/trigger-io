@@ -1,21 +1,51 @@
-export const Table = ({ data }: { data: any }) => (
-  <div className="overflow-x-auto">
-    <table className="min-w-full bg-white border border-gray-300">
-      <thead>
+import { User } from '../types/user.types';
+
+export const Table = ({ data }: { data: User[] }) => (
+  <div className="overflow-hidden border border-gray-200 rounded-lg shadow">
+    <table className="min-w-full divide-y divide-gray-200">
+      <thead className="bg-gray-50">
         <tr>
-          <th className="py-2 px-4 border-b">ID</th>
-          <th className="py-2 px-4 border-b">Name</th>
-          <th className="py-2 px-4 border-b">Email</th>
-          <th className="py-2 px-4 border-b">PhoneNumber</th>
+          <th
+            scope="col"
+            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            ID
+          </th>
+          <th
+            scope="col"
+            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Name
+          </th>
+          <th
+            scope="col"
+            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            Email
+          </th>
+          <th
+            scope="col"
+            className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+          >
+            PhoneNumber
+          </th>
         </tr>
       </thead>
-      <tbody>
-        {data.map((item: any) => (
+      <tbody className="bg-white divide-y divide-gray-200">
+        {data.map((item) => (
           <tr key={item.id}>
-            <td className="py-2 px-4 border-b">{item.id}</td>
-            <td className="py-2 px-4 border-b">{item.name}</td>
-            <td className="py-2 px-4 border-b">{item.email}</td>
-            <td className="py-2 px-4 border-b">{item.phoneNumber}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {item.id.split('-')[0]}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {item.name}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {item.email}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              {item.phoneNumber}
+            </td>
           </tr>
         ))}
       </tbody>

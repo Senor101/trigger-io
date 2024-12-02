@@ -4,22 +4,28 @@ import { Client } from 'pg';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import apiRouter from './routes';
+import cors from 'cors';
 dotenv.config();
 
 const app = express();
 const PORT = 8000;
 
 const server = http.createServer(app);
-const io = new Server(server);
-
-const client = new Client({
-  connectionString: 'postgresql://postgres:password@localhost:5432/trig',
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+  },
 });
 
-// io.on('connection', function (socket) {
-//   console.log(`${socket.id} connected.`);
-// });
-//
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+});
+
+io.on('connection', function (socket) {
+  console.log(`${socket.id} connected.`);
+});
+
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
