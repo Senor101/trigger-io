@@ -12,8 +12,8 @@ const userRouter = Router({
 
 userRouter.get('/', getUsers);
 userRouter.post('/', createUser);
-userRouter.get('/:id', getSingleUser);
-userRouter.put('/:id', updateUser);
-userRouter.delete('/:id', updateUser);
+userRouter.get('/:userId', getSingleUser);
+userRouter.put('/:userId', updateUser);
+userRouter.delete('/:userId', updateUser);
 
 export default userRouter;
