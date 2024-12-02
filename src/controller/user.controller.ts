@@ -4,7 +4,20 @@ import { UserService } from '../service';
 export async function getUsers(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
+): Promise<Response | void> {
+  const users = await UserService.getUsers();
+
+  res.status(200).json({
+    message: 'Users fetched successfully.',
+    data: users,
+  });
+}
+
+export async function getSingleUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) {
   try {
     const users = UserService.getUsers();
@@ -21,7 +34,7 @@ export async function getUsers(
 export async function createUser(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   try {
     const users = UserService.createUser();
@@ -38,7 +51,7 @@ export async function createUser(
 export async function updateUser(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   try {
     const users = UserService.updateUser();
@@ -55,7 +68,7 @@ export async function updateUser(
 export async function deleteUser(
   req: Request,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) {
   try {
     const users = UserService.deleteUser();

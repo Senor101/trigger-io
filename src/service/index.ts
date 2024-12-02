@@ -1,6 +1,12 @@
+import { PrismaClient } from '@prisma/client';
+
+const client = new PrismaClient();
+
 export class UserService {
-  static getUsers() {
+  static async getUsers() {
     try {
+      const users = await client.user.findMany();
+      return users;
     } catch (error) {
       throw error;
     }

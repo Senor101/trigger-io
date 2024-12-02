@@ -3,6 +3,7 @@ import http from 'http';
 import { Client } from 'pg';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
+import apiRouter from './routes';
 dotenv.config();
 
 const app = express();
@@ -21,6 +22,8 @@ const client = new Client({
 //
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+app.use('/', apiRouter);
 
 server.listen(PORT, async function () {
   try {
