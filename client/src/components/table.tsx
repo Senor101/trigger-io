@@ -1,6 +1,6 @@
-import { User } from '../types/user.types';
+import { TUser } from '../types/user.types';
 
-export const Table = ({ data }: { data: User[] }) => (
+export const Table = ({ data }: { data: TUser[] }) => (
   <div className="overflow-hidden border border-gray-200 rounded-lg shadow">
     <table className="min-w-full divide-y divide-gray-200">
       <thead className="bg-gray-50">
