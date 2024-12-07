@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { UserService } from '../service';
+import { UserService } from '../service/user.service';
 
 export async function getUsers(
   req: Request,
@@ -20,11 +20,12 @@ export async function getSingleUser(
   next: NextFunction
 ) {
   try {
-    const users = UserService.getUsers();
+    const { userId } = req.params;
+    const user = UserService.getOneUser(userId);
 
     return res.status(200).json({
-      message: 'Users fetched successfully.',
-      data: users,
+      message: 'User fetched successfully.',
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -37,11 +38,11 @@ export async function createUser(
   next: NextFunction
 ) {
   try {
-    const users = UserService.createUser();
+    const user = UserService.createUser(req.body);
 
-    return res.status(200).json({
-      message: 'Users fetched successfully.',
-      data: users,
+    return res.status(201).json({
+      message: 'User created successfully.',
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -54,11 +55,12 @@ export async function updateUser(
   next: NextFunction
 ) {
   try {
-    const users = UserService.updateUser();
+    const { userId } = req.params;
+    const user = UserService.updateUser(userId, req.body);
 
     return res.status(200).json({
-      message: 'Users fetched successfully.',
-      data: users,
+      message: 'User updated successfully.',
+      data: user,
     });
   } catch (error) {
     next(error);
@@ -71,11 +73,12 @@ export async function deleteUser(
   next: NextFunction
 ) {
   try {
-    const users = UserService.deleteUser();
+    const { userId } = req.params;
+    const user = UserService.deleteUser(userId);
 
     return res.status(200).json({
-      message: 'Users fetched successfully.',
-      data: users,
+      message: 'User deleted successfully.',
+      data: user,
     });
   } catch (error) {
     next(error);

@@ -21,12 +21,12 @@ model User {
   name        String
   phoneNumber String @map("phone_number")
   email       String @unique
-  Blog        Blog[]
+  books       Book[]
 
   @@map("app_user")
 }
 
-model Blog {
+model Book {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
