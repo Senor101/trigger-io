@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Table } from '../components/table';
 import { TUser } from '../types/user.types';
 const BASE_URL = `http://localhost:8000/users`;
 
 function User() {
   const [users, setUsers] = useState<TUser[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    // phoneNumber: '',
   });
+
+  const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -19,6 +21,22 @@ function User() {
     };
 
     fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    function handleClick(event: MouseEvent) {
+      if (
+        dialogRef.current &&
+        !dialogRef.current?.contains(event.target as Node)
+      ) {
+        setIsDialogOpen(false);
+      }
+    }
+
+    document.addEventListener('click', handleClick);
+    return () => {
+      document.removeEventListener('click', handleClick);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -35,33 +53,78 @@ function User() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold mb-4">User Management</h1>
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div>
-          <label className="block mb-2">Name:</label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="border p-2 mb-2"
-          />
-        </div>
-        <div>
-          <label className="block mb-2">Email:</label>
-          <input
-            type="email"
-            value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
-            className="border p-2 mb-2"
-          />
-        </div>
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+      {/* Create User Button */}
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+          onClick={() => setIsDialogOpen(true)}
+        >
           Create User
         </button>
-      </form>
-      <Table data={users} />
+      </div>
+
+      {/* Main Table Section */}
+      <div className="mt-4">
+        <Table data={users} />
+      </div>
+
+      {/* Dialog Box */}
+      {isDialogOpen && (
+        <div
+          className={`${
+            // isDialogOpen ? 'fixed' : 'hidden'
+            'fixed'
+          } inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50`}
+        >
+          <div
+            ref={dialogRef}
+            className="bg-white p-6 rounded shadow-lg w-full max-w-md"
+          >
+            <h2 className="text-xl font-bold mb-4">Create User</h2>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium ">Name:</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  className="border w-full p-2 rounded"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium">Email:</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
+                  className="border w-full p-2 rounded"
+                  required
+                />
+              </div>
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="bg-gray-300 text-black p-2 rounded mr-2 hover:bg-gray-400"
+                  onClick={() => setIsDialogOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                >
+                  Submit
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }
