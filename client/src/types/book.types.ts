@@ -1,4 +1,4 @@
-import { TUser } from './user.types';
+// import { TUser } from './user.types';
 
 export type TBook = {
   id: string;
@@ -6,5 +6,6 @@ export type TBook = {
   updatedAt?: string;
   title: string;
   description: string;
-  author: TUser;
+  author: string;
+  ISBN: string;
 };
