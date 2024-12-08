@@ -5,6 +5,7 @@ import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 import apiRouter from './routes';
 import cors from 'cors';
+import { Database } from './config/database.confitg';
 dotenv.config();
 
 const app = express();
@@ -33,6 +34,7 @@ app.use('/', apiRouter);
 
 server.listen(PORT, async function () {
   try {
+    await Database.connect();
     await client.connect();
 
     const query = await client.query('LISTEN new_event');

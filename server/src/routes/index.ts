@@ -6,5 +6,6 @@ const apiRouter = Router({
 });
 
 apiRouter.use('/users', userRouter);
+apiRouter.use('/books', userRouter);
 
 export default apiRouter;

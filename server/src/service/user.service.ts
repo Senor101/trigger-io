@@ -1,11 +1,10 @@
 import { Prisma, PrismaClient } from '@prisma/client';
-
-const client = new PrismaClient();
+import { Database as db } from '../config/database.confitg';
 
 export class UserService {
   static async getUsers() {
     try {
-      const users = await client.user.findMany();
+      const users = await db.client.user.findMany();
       return users;
     } catch (error) {
       throw error;
@@ -14,7 +13,7 @@ export class UserService {
 
   static async getOneUser(userId: string) {
     try {
-      const users = await client.user.findUnique({
+      const users = await db.client.user.findUnique({
         where: {
           id: userId,
         },
@@ -27,7 +26,7 @@ export class UserService {
 
   static async createUser(data: Prisma.UserCreateInput) {
     try {
-      const newUser = await client.user.create({
+      const newUser = await db.client.user.create({
         data,
       });
 
@@ -39,7 +38,7 @@ export class UserService {
 
   static async updateUser(userId: string, data: Prisma.UserUpdateInput) {
     try {
-      const updatedUser = await client.user.update({
+      const updatedUser = await db.client.user.update({
         where: {
           id: userId,
         },
@@ -52,7 +51,7 @@ export class UserService {
 
   static async deleteUser(userId: string) {
     try {
-      const deletedUser = await client.user.delete({
+      const deletedUser = await db.client.user.delete({
         where: {
           id: userId,
         },
