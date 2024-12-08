@@ -62,7 +62,7 @@ function Book() {
       setBooks((prev) => [...prev, newbook]);
     } else if (mode === 'update' && currentbookId) {
       const response = await fetch(`${BASE_URL}/${currentbookId}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
@@ -109,7 +109,17 @@ function Book() {
 
       {/* Main Table Section */}
       <div className="mt-4">
-        <Table data={books} onUpdate={handleUpdate} onDelete={handleDelete} />
+        <Table
+          data={books.map((b) => {
+            delete b.createdAt;
+            delete b.updatedAt;
+            b.id = b.id.split('-')[0];
+
+            return b;
+          })}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+        />
       </div>
 
       {/* Dialog Box */}

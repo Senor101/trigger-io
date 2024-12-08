@@ -62,7 +62,7 @@ function User() {
       setUsers((prev) => [...prev, newUser]);
     } else if (mode === 'update' && currentUserId) {
       const response = await fetch(`${BASE_URL}/${currentUserId}`, {
-        method: 'PATCH',
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
