@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Table } from '../components/table';
 import { TUser } from '../types/user.types';
+import socket from '../utils/socket.util';
 const BASE_URL = `http://localhost:8000/users`;
 
 function User() {
@@ -24,6 +25,18 @@ function User() {
     };
 
     fetchUsers();
+
+    socket.on('connect', () => {
+      console.log(`Connected to server`);
+    });
+
+    socket.on(`user`, async () => {
+      fetchUsers();
+    });
+
+    return () => {
+      socket.off();
+    };
   }, []);
 
   useEffect(() => {
