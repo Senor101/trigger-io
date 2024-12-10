@@ -80,8 +80,11 @@ function User() {
         body: JSON.stringify(formData),
       });
       const updatedUser = await response.json();
+      console.log(updatedUser);
       setUsers((prev) =>
-        prev.map((user) => (user.id === currentUserId ? updatedUser : user))
+        prev.map((user) =>
+          user.id === currentUserId ? updatedUser.data : user
+        )
       );
     }
 
@@ -90,6 +93,7 @@ function User() {
   };
 
   const handleUpdate = (user: TUser) => {
+    console.log(user);
     setMode('update');
     setCurrentUserId(user.id);
     setFormData({
@@ -126,7 +130,6 @@ function User() {
           data={users.map((u) => {
             delete u.createdAt;
             delete u.updatedAt;
-            u.id = u.id.split('-')[0];
             return u;
           })}
           onUpdate={handleUpdate}

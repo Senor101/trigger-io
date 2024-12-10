@@ -44,6 +44,8 @@ export class UserService {
         },
         data,
       });
+
+      return updatedUser;
     } catch (error) {
       throw error;
     }

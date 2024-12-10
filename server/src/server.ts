@@ -25,6 +25,9 @@ const client = new Client({
 io.on('connection', function (socket) {
   console.log(`${socket.id} connected.`);
 });
+io.on('disconnect', function (socket) {
+  console.log(`${socket.id} disconnected.`);
+});
 
 app.use(cors());
 app.use(express.json());
@@ -37,18 +40,18 @@ server.listen(PORT, async function () {
     await Database.connect();
     await client.connect();
 
-    await Database.query(`LISTEN new_event`);
+    // await Database.query(`LISTEN new_event`);
 
-    Database.client.$on('notification', (msg: any) => {
-      console.log('Notification Incoming');
-      console.log(msg.payload);
-    });
-    // const query = await client.query('LISTEN new_event');
-
-    // client.on('notification', function (msg) {
-    //   console.log(`Notificaiton incoming, ${msg}`);
-    //   const payload = JSON.parse(msg.payload ?? '');
+    // Database.client.$on('notification', (msg: any) => {
+    //   console.log('Notification Incoming');
+    //   console.log(msg.payload);
     // });
+    const query = await client.query('LISTEN new_event');
+
+    client.on('notification', function (msg) {
+      console.log(`Notificaiton incoming, ${msg}`);
+      const payload = JSON.parse(msg.payload ?? '');
+    });
 
     console.log(`Server running on port: ${PORT}`);
   } catch (error) {

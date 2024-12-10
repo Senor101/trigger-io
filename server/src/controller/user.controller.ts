@@ -56,7 +56,7 @@ export async function updateUser(
 ) {
   try {
     const { userId } = req.params;
-    const user = UserService.updateUser(userId, req.body);
+    const user = await UserService.updateUser(userId, req.body);
 
     return res.status(200).json({
       message: 'User updated successfully.',
