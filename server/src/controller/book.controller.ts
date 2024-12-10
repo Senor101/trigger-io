@@ -1,83 +1,84 @@
 import { Request, Response, NextFunction } from 'express';
+import { BookService } from '../service/book.service';
 
-export async function getUsers(
+export async function getBook(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<Response | void> {
-  const users = await BookService.getUsers();
+  const books = await BookService.getBooks();
 
   res.status(200).json({
-    message: 'Users fetched successfully.',
-    data: users,
+    message: 'Books fetched successfully',
+    data: books,
   });
 }
 
-export async function getSingleUser(
+export async function getSingleBook(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const { userId } = req.params;
-    const user = BookService.getOneUser(userId);
+    const { bookId } = req.params;
+    const book = BookService.getOneBook(bookId);
 
     return res.status(200).json({
-      message: 'User fetched successfully.',
-      data: user,
+      message: 'Book fetched successfully.',
+      data: book,
     });
   } catch (error) {
     next(error);
   }
 }
 
-export async function createUser(
+export async function createBook(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const user = BookService.createUser(req.body);
+    const book = BookService.createBook(req.body);
 
     return res.status(201).json({
-      message: 'User created successfully.',
-      data: user,
+      message: 'Book created successfully.',
+      data: book,
     });
   } catch (error) {
     next(error);
   }
 }
 
-export async function updateUser(
+export async function updateBook(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const { userId } = req.params;
-    const user = BookService.updateUser(userId, req.body);
+    const { bookId } = req.params;
+    const book = BookService.updateBook(bookId, req.body);
 
     return res.status(200).json({
-      message: 'User updated successfully.',
-      data: user,
+      message: 'Book updated successfully.',
+      data: book,
     });
   } catch (error) {
     next(error);
   }
 }
 
-export async function deleteUser(
+export async function deleteBook(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   try {
-    const { userId } = req.params;
-    const user = BookService.deleteUser(userId);
+    const { bookId } = req.params;
+    const book = BookService.deleteBook(bookId);
 
     return res.status(200).json({
-      message: 'User deleted successfully.',
-      data: user,
+      message: 'Book deleted successfully.',
+      data: book,
     });
   } catch (error) {
     next(error);
