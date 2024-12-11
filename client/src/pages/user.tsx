@@ -72,7 +72,9 @@ function User() {
         body: JSON.stringify(formData),
       });
       const newUser = await response.json();
-      setUsers((prev) => [...prev, newUser]);
+      setUsers((prev) => {
+        return [...prev, newUser.data];
+      });
     } else if (mode === 'update' && currentUserId) {
       const response = await fetch(`${BASE_URL}/${currentUserId}`, {
         method: 'PUT',
