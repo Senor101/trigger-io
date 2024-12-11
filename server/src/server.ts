@@ -40,17 +40,12 @@ server.listen(PORT, async function () {
     await Database.connect();
     await client.connect();
 
-    // await Database.query(`LISTEN new_event`);
-
-    // Database.client.$on('notification', (msg: any) => {
-    //   console.log('Notification Incoming');
-    //   console.log(msg.payload);
-    // });
     const query = await client.query('LISTEN new_event');
 
     client.on('notification', function (msg) {
-      console.log(`Notificaiton incoming, ${msg}`);
+      console.log(`Notificaiton incoming, ${msg.payload}`);
       const payload = JSON.parse(msg.payload ?? '');
+      io.emit(payload.table, { action: payload.operation });
     });
 
     console.log(`Server running on port: ${PORT}`);

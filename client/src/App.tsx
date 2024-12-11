@@ -2,8 +2,16 @@ import './App.css';
 import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import User from './pages/user';
 import Book from './pages/books';
+import { useEffect } from 'react';
+import socket from './utils/socket.util';
 
 function App() {
+  useEffect(() => {
+    socket.on('connect', async () => {
+      console.log('Connected to socket server.');
+    });
+  });
+
   return (
     <Router>
       <div className="p-4">

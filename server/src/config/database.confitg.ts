@@ -16,7 +16,7 @@ export class Database {
     }
   }
 
-  public static query(query: string) {
+  public static async query(query: string) {
     return this.dbClient.$queryRawUnsafe(query);
   }
 

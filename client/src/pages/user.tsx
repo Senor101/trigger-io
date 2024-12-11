@@ -26,11 +26,7 @@ function User() {
 
     fetchUsers();
 
-    socket.on('connect', () => {
-      console.log(`Connected to server`);
-    });
-
-    socket.on(`user`, async () => {
+    socket.on(`app_user`, async () => {
       fetchUsers();
     });
 
@@ -94,10 +90,13 @@ function User() {
     resetForm();
   };
 
-  const handleUpdate = (user: TUser) => {
-    console.log(user);
+  const handleUpdate = (
+    user: TUser,
+    setMenuOpen: (x: number | null) => void
+  ) => {
     setMode('update');
     setCurrentUserId(user.id);
+    setMenuOpen(null);
     setFormData({
       name: user.name || '',
       email: user.email || '',
@@ -141,7 +140,7 @@ function User() {
 
       {/* Dialog Box */}
       {isDialogOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-5">
           <div
             ref={dialogRef}
             className="bg-white p-6 rounded shadow-lg w-full max-w-md"
