@@ -7,7 +7,7 @@ export const Table = <T extends Record<string, any>>({
   onDelete,
 }: {
   data: T[];
-  onUpdate?: (item: T) => void;
+  onUpdate?: (item: T, setMenuOpen: (x: number | null) => void) => void;
   onDelete?: (item: T) => void;
 }) => {
   const [menuOpen, setMenuOpen] = useState<number | null>(null); // Track open menu by row index
@@ -19,7 +19,7 @@ export const Table = <T extends Record<string, any>>({
   const headers = Object.keys(data[0]);
 
   return (
-    <div className="overflow-hidden border border-gray-200 rounded-lg shadow">
+    <div className="border border-gray-200 rounded-lg shadow">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
@@ -66,7 +66,7 @@ export const Table = <T extends Record<string, any>>({
                 {menuOpen === rowIndex && (
                   <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg z-10">
                     <button
-                      onClick={() => onUpdate && onUpdate(row)}
+                      onClick={() => onUpdate && onUpdate(row, setMenuOpen)}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Update

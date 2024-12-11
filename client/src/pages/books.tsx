@@ -59,7 +59,9 @@ function Book() {
         body: JSON.stringify(formData),
       });
       const newbook = await response.json();
-      setBooks((prev) => [...prev, newbook]);
+      setBooks((prev) => {
+        return [...prev, newbook.data];
+      });
     } else if (mode === 'update' && currentbookId) {
       const response = await fetch(`${BASE_URL}/${currentbookId}`, {
         method: 'PUT',
@@ -68,7 +70,9 @@ function Book() {
       });
       const updatedbook = await response.json();
       setBooks((prev) =>
-        prev.map((book) => (book.id === currentbookId ? updatedbook : book))
+        prev.map((book) =>
+          book.id === currentbookId ? updatedbook.data : book
+        )
       );
     }
 
@@ -159,7 +163,7 @@ function Book() {
               </div>
               <div className="mb-4">
                 <label className="block mb-2 text-sm font-medium">
-                  Phone Number:
+                  Author:
                 </label>
                 <input
                   type="text"

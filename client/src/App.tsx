@@ -1,11 +1,17 @@
 import './App.css';
-// import { Table } from './components/table';
-// import socket from './utils/socket.util';
 import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import User from './pages/user';
 import Book from './pages/books';
+import { useEffect } from 'react';
+import socket from './utils/socket.util';
 
 function App() {
+  useEffect(() => {
+    socket.on('connect', async () => {
+      console.log('Connected to socket server.');
+    });
+  });
+
   return (
     <Router>
       <div className="p-4">
@@ -27,6 +33,7 @@ function App() {
 
         {/* Page Routes */}
         <Routes>
+          {/* <Route path="/" element={#} /> */}
           <Route path="/users" element={<User />} />
           <Route path="/books" element={<Book />} />
         </Routes>
@@ -34,44 +41,5 @@ function App() {
     </Router>
   );
 }
-
-// function App() {
-//   const [data, setData] = useState<User[]>([]);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const response = await fetch('http://localhost:8000/users');
-//         const result = await response.json();
-//         setData(result.data);
-//       } catch (error) {
-//         console.error(error);
-//       }
-//     };
-
-//     fetchData();
-//     socket.on('connection', () => {
-//       console.log('Connected to server');
-//     });
-
-//     socket.on('user', async () => {
-//       // Put your refetch logic here
-//       const response = await fetch('http://localhost:8000/users');
-//       const result = await response.json();
-//       setData(result.data);
-//     });
-
-//     return () => {
-//       socket.off('user');
-//     };
-//   }, []);
-
-//   return (
-//     <div className="p-4">
-//       <h1 className="text-2xl font-bold mb-4">Users</h1>
-//       <Table data={data} />
-//     </div>
-//   );
-// }
 
 export default App;

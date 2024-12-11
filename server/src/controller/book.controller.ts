@@ -21,7 +21,7 @@ export async function getSingleBook(
 ) {
   try {
     const { bookId } = req.params;
-    const book = BookService.getOneBook(bookId);
+    const book = await BookService.getOneBook(bookId);
 
     return res.status(200).json({
       message: 'Book fetched successfully.',
@@ -38,7 +38,13 @@ export async function createBook(
   next: NextFunction
 ) {
   try {
-    const book = BookService.createBook(req.body);
+    const data = req.body;
+    const book = await BookService.createBook({
+      title: data.title,
+      author: { connect: { id: data.author } },
+      ISBN: data.ISBN,
+      description: data.description,
+    });
 
     return res.status(201).json({
       message: 'Book created successfully.',
@@ -56,7 +62,7 @@ export async function updateBook(
 ) {
   try {
     const { bookId } = req.params;
-    const book = BookService.updateBook(bookId, req.body);
+    const book = await BookService.updateBook(bookId, req.body);
 
     return res.status(200).json({
       message: 'Book updated successfully.',
@@ -74,7 +80,7 @@ export async function deleteBook(
 ) {
   try {
     const { bookId } = req.params;
-    const book = BookService.deleteBook(bookId);
+    const book = await BookService.deleteBook(bookId);
 
     return res.status(200).json({
       message: 'Book deleted successfully.',

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Table } from '../components/table';
 import { TUser } from '../types/user.types';
+import socket from '../utils/socket.util';
 const BASE_URL = `http://localhost:8000/users`;
 
 function User() {
@@ -24,6 +25,14 @@ function User() {
     };
 
     fetchUsers();
+
+    socket.on(`app_user`, async () => {
+      fetchUsers();
+    });
+
+    return () => {
+      socket.off();
+    };
   }, []);
 
   useEffect(() => {
@@ -59,7 +68,9 @@ function User() {
         body: JSON.stringify(formData),
       });
       const newUser = await response.json();
-      setUsers((prev) => [...prev, newUser]);
+      setUsers((prev) => {
+        return [...prev, newUser.data];
+      });
     } else if (mode === 'update' && currentUserId) {
       const response = await fetch(`${BASE_URL}/${currentUserId}`, {
         method: 'PUT',
@@ -67,8 +78,11 @@ function User() {
         body: JSON.stringify(formData),
       });
       const updatedUser = await response.json();
+      console.log(updatedUser);
       setUsers((prev) =>
-        prev.map((user) => (user.id === currentUserId ? updatedUser : user))
+        prev.map((user) =>
+          user.id === currentUserId ? updatedUser.data : user
+        )
       );
     }
 
@@ -76,9 +90,13 @@ function User() {
     resetForm();
   };
 
-  const handleUpdate = (user: TUser) => {
+  const handleUpdate = (
+    user: TUser,
+    setMenuOpen: (x: number | null) => void
+  ) => {
     setMode('update');
     setCurrentUserId(user.id);
+    setMenuOpen(null);
     setFormData({
       name: user.name || '',
       email: user.email || '',
@@ -113,7 +131,6 @@ function User() {
           data={users.map((u) => {
             delete u.createdAt;
             delete u.updatedAt;
-            u.id = u.id.split('-')[0];
             return u;
           })}
           onUpdate={handleUpdate}
@@ -123,7 +140,7 @@ function User() {
 
       {/* Dialog Box */}
       {isDialogOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-5">
           <div
             ref={dialogRef}
             className="bg-white p-6 rounded shadow-lg w-full max-w-md"
