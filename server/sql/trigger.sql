@@ -23,6 +23,41 @@ BEGIN
       'data', payload
     )::text
   );
+
+  FOR referencing_table IN 
+    SELECT 
+      tc.table_name AS referencing_table,
+      kcu.column_name AS referencing_column,
+      ccu.column_name AS referenced_column
+    FROM
+      information_schema.table_constraints AS tc
+      JOIN information_schema.key_column_usage as kcu
+      ON tc.constraint_name = kcu.constraint_name
+      JOIN information_schema.constraint_column_usage as ccu
+      ON ccu.constraint_name = tc.constraint_name
+    WHERE
+      tc.constraint_type = 'FOREIGN KEY'
+      AND tc.table_name = TG_TABLE_NAME
+    LOOP
+
+    EXECUTE format(
+      'SELECT json_agg(row_to_json(t)) FROM %I t where t.%I = $1',
+      referencing_table.referencing_table,
+      referencing_table.referencing_column
+    ) INTO affected_rows
+    USING (CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END).(referencing_table.referenced_column)
+
+    IF affected_rows IS NOT NULL THEN
+      PERFORM pg_notify('new_event',
+        json_build_object(
+          'table', referencing_table.referencing_table,
+          'operation', TG_OP || '(via reference)',
+          'affected_rows', affected_rows
+        )::text
+      );
+      END IF;
+    END LOOP;
+
   RETURN NEW;
 END;
 $FUNCTION$
