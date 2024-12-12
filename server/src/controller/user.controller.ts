@@ -38,7 +38,12 @@ export async function createUser(
   next: NextFunction
 ) {
   try {
-    const user = UserService.createUser(req.body);
+    const data = req.body;
+    const user = UserService.createUser({
+      name: data.name,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+    });
 
     return res.status(201).json({
       message: 'User created successfully.',
@@ -56,7 +61,12 @@ export async function updateUser(
 ) {
   try {
     const { userId } = req.params;
-    const user = await UserService.updateUser(userId, req.body);
+    const data = req.body;
+    const user = await UserService.updateUser(userId, {
+      name: data.name,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+    });
 
     return res.status(200).json({
       message: 'User updated successfully.',

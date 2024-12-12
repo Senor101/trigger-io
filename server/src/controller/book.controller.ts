@@ -62,7 +62,13 @@ export async function updateBook(
 ) {
   try {
     const { bookId } = req.params;
-    const book = await BookService.updateBook(bookId, req.body);
+    const data = req.body;
+    const book = await BookService.updateBook(bookId, {
+      title: data.title,
+      author: data.author ? { connect: { id: data.author } } : undefined,
+      ISBN: data.ISBN,
+      description: data.description,
+    });
 
     return res.status(200).json({
       message: 'Book updated successfully.',
