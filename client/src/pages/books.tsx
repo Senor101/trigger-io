@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Table } from '../components/table';
 import { TBook } from '../types/book.types';
+import { TUser } from '../types/user.types';
+import socket from '../utils/socket.util';
 const BASE_URL = `http://localhost:8000/books`;
 
 function Book() {
   const [books, setBooks] = useState<TBook[]>([]);
+  const [authors, setAuthors] = useState<TUser[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [mode, setMode] = useState<'create' | 'update'>('create');
   const [currentbookId, setCurrentbookId] = useState<string | null>(null);
@@ -12,18 +15,30 @@ function Book() {
     title: '',
     author: '',
     ISBN: '',
+    description: '',
   });
 
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const fetchbooks = async () => {
+    const fetchBooks = async () => {
       const response = await fetch(BASE_URL);
       const data = await response.json();
       setBooks(data.data);
     };
 
-    fetchbooks();
+    const fetchAuthors = async () => {
+      const response = await fetch('http://localhost:8000/users');
+      const data = await response.json();
+      setAuthors(data.data);
+    };
+
+    socket.on(`book`, async () => {
+      fetchBooks();
+    });
+
+    fetchBooks();
+    fetchAuthors();
   }, []);
 
   useEffect(() => {
@@ -44,7 +59,7 @@ function Book() {
   }, []);
 
   const resetForm = () => {
-    setFormData({ title: '', ISBN: '', author: '' });
+    setFormData({ title: '', author: '', ISBN: '', description: '' });
     setMode('create');
     setCurrentbookId(null);
   };
@@ -87,6 +102,7 @@ function Book() {
       title: book.title || '',
       author: book.author || '',
       ISBN: book.ISBN || '',
+      description: book.description || '',
     });
     setIsDialogOpen(true);
   };
@@ -115,11 +131,13 @@ function Book() {
       <div className="mt-4">
         <Table
           data={books.map((b) => {
-            delete b.createdAt;
-            delete b.updatedAt;
-            b.id = b.id.split('-')[0];
-
-            return b;
+            return {
+              id: b.id,
+              title: b.title,
+              author: b.author?.name,
+              ISBN: b.ISBN,
+              description: b.description,
+            };
           })}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
@@ -150,9 +168,28 @@ function Book() {
                 />
               </div>
               <div className="mb-4">
+                <label className="block mb-2 text-sm font-medium">
+                  Author:
+                </label>
+                <select
+                  className="p-2 w-full border rounded-md"
+                  onChange={(e) =>
+                    setFormData({ ...formData, author: e.target.value })
+                  }
+                >
+                  <option value="">Select Value</option>
+                  {authors.map((author) => (
+                    <option key={author.id} value={author.id}>
+                      {author.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="mb-4">
                 <label className="block mb-2 text-sm font-medium">ISBN:</label>
                 <input
-                  type="email"
+                  type="text"
                   value={formData.ISBN}
                   onChange={(e) =>
                     setFormData({ ...formData, ISBN: e.target.value })
@@ -161,20 +198,21 @@ function Book() {
                   required
                 />
               </div>
+
               <div className="mb-4">
                 <label className="block mb-2 text-sm font-medium">
-                  Author:
+                  Description:
                 </label>
-                <input
-                  type="text"
-                  value={formData.author}
+                <textarea
+                  value={formData.description}
                   onChange={(e) =>
-                    setFormData({ ...formData, author: e.target.value })
+                    setFormData({ ...formData, description: e.target.value })
                   }
                   className="border w-full p-2 rounded"
                   required
                 />
               </div>
+
               <div className="flex justify-end">
                 <button
                   type="button"

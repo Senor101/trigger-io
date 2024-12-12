@@ -13,8 +13,8 @@ const bookRouter = Router({
 
 bookRouter.get('/', getBook);
 bookRouter.post('/', createBook);
-bookRouter.get('/:userId', getSingleBook);
-bookRouter.put('/:userId', updateBook);
-bookRouter.delete('/:userId', deleteBook);
+bookRouter.get('/:bookId', getSingleBook);
+bookRouter.put('/:bookId', updateBook);
+bookRouter.delete('/:bookId', deleteBook);
 
 export default bookRouter;

@@ -34,7 +34,7 @@ export const Table = <T extends Record<string, any>>({
   const headers = Object.keys(data[0]);
 
   return (
-    <div className="border border-gray-200 rounded-lg shadow">
+    <div className="overflow-scroll border border-gray-200 rounded-lg shadow">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
@@ -81,7 +81,7 @@ export const Table = <T extends Record<string, any>>({
                 {menuOpen === rowIndex && (
                   <div
                     ref={menuRef}
-                    className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg z-10"
+                    className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-xl z-10"
                   >
                     <button
                       onClick={() => onUpdate && onUpdate(row, setMenuOpen)}

@@ -4,7 +4,11 @@ import { Database as db } from '../config/database.confitg';
 export class UserService {
   static async getUsers() {
     try {
-      const users = await db.client.user.findMany();
+      const users = await db.client.user.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
       return users;
     } catch (error) {
       throw error;

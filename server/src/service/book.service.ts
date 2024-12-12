@@ -4,7 +4,14 @@ import { Database as db } from '../config/database.confitg';
 export class BookService {
   static async getBooks() {
     try {
-      const books = await db.client.book.findMany();
+      const books = await db.client.book.findMany({
+        include: {
+          author: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
       return books;
     } catch (error) {
       throw error;
