@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 //eslint-disable-next-line
 export const Table = <T extends Record<string, any>>({
@@ -11,6 +11,21 @@ export const Table = <T extends Record<string, any>>({
   onDelete?: (item: T) => void;
 }) => {
   const [menuOpen, setMenuOpen] = useState<number | null>(null); // Track open menu by row index
+
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   if (!data.length) {
     return <div className="text-gray-500 p-4">No data available</div>;
@@ -64,7 +79,10 @@ export const Table = <T extends Record<string, any>>({
                   ⋮
                 </button>
                 {menuOpen === rowIndex && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg z-10">
+                  <div
+                    ref={menuRef}
+                    className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg z-10"
+                  >
                     <button
                       onClick={() => onUpdate && onUpdate(row, setMenuOpen)}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
