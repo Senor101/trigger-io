@@ -8,6 +8,9 @@ CREATE OR REPLACE FUNCTION public.notify_changes()
 AS $FUNCTION$
 DECLARE
   payload JSON;
+  referencing_table RECORD;
+  affected_rows JSON;
+  referenced_value TEXT;
 BEGIN
   IF (TG_OP = 'DELETE') THEN
     payload := row_to_json(OLD);
@@ -23,6 +26,48 @@ BEGIN
       'data', payload
     )::text
   );
+
+  RAISE NOTICE 'Processing table: %', TG_TABLE_NAME;
+
+  FOR referencing_table IN 
+    SELECT 
+      tc.table_name AS referencing_table,
+      kcu.column_name AS referencing_column,
+      ccu.column_name AS referenced_column
+    FROM
+      information_schema.table_constraints AS tc
+      JOIN information_schema.key_column_usage as kcu
+      ON tc.constraint_name = kcu.constraint_name
+      JOIN information_schema.constraint_column_usage as ccu
+      ON ccu.constraint_name = tc.constraint_name
+    WHERE
+      tc.constraint_type = 'FOREIGN KEY'
+      AND tc.table_name = TG_TABLE_NAME
+    LOOP
+
+    EXECUTE FORMAT(
+      'SELECT ($1).%I',
+      referencing_table.referenced_column
+    ) INTO referenced_value USING CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
+
+    EXECUTE format(
+      'SELECT json_agg(row_to_json(t)) FROM %I t where t.%I = $1',
+      referencing_table.referencing_table,
+      referencing_table.referencing_column
+    ) INTO affected_rows
+    USING referenced_value;
+
+    IF affected_rows IS NOT NULL THEN
+      PERFORM pg_notify('new_event',
+        json_build_object(
+          'table', referencing_table.referencing_table,
+          'operation', TG_OP || '(via reference)',
+          'affected_rows', affected_rows
+        )::text
+      );
+      END IF;
+    END LOOP;
+
   RETURN NEW;
 END;
 $FUNCTION$
