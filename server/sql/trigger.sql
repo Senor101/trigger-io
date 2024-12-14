@@ -8,6 +8,9 @@ CREATE OR REPLACE FUNCTION public.notify_changes()
 AS $FUNCTION$
 DECLARE
   payload JSON;
+  referencing_table RECORD;
+  affected_rows JSON;
+  referenced_value TEXT;
 BEGIN
   IF (TG_OP = 'DELETE') THEN
     payload := row_to_json(OLD);
@@ -23,6 +26,8 @@ BEGIN
       'data', payload
     )::text
   );
+
+  RAISE NOTICE 'Processing table: %', TG_TABLE_NAME;
 
   FOR referencing_table IN 
     SELECT 
@@ -40,12 +45,17 @@ BEGIN
       AND tc.table_name = TG_TABLE_NAME
     LOOP
 
+    EXECUTE FORMAT(
+      'SELECT ($1).%I',
+      referencing_table.referenced_column
+    ) INTO referenced_value USING CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
+
     EXECUTE format(
       'SELECT json_agg(row_to_json(t)) FROM %I t where t.%I = $1',
       referencing_table.referencing_table,
       referencing_table.referencing_column
     ) INTO affected_rows
-    USING (CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END).(referencing_table.referenced_column)
+    USING referenced_value;
 
     IF affected_rows IS NOT NULL THEN
       PERFORM pg_notify('new_event',
