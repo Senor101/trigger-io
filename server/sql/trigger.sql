@@ -20,7 +20,7 @@ BEGIN
   END IF;
 
   EXECUTE FORMAT(
-    'SELECT ($1).%I', 'id'
+    'SELECT ($1).id'
   ) INTO referenced_value USING CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
 
   PERFORM pg_notify('new_event',
@@ -38,16 +38,17 @@ BEGIN
     SELECT 
       tc.table_name AS referencing_table,
       kcu.column_name AS referencing_column,
+      ccu.table_name AS referenced_table,
       ccu.column_name AS referenced_column
-    FROM
+    FROM 
       information_schema.table_constraints AS tc
-      JOIN information_schema.key_column_usage as kcu
-      ON tc.constraint_name = kcu.constraint_name
-      JOIN information_schema.constraint_column_usage as ccu
-      ON ccu.constraint_name = tc.constraint_name
-    WHERE
+      JOIN information_schema.key_column_usage AS kcu
+        ON tc.constraint_name = kcu.constraint_name
+      JOIN information_schema.constraint_column_usage AS ccu
+        ON ccu.constraint_name = tc.constraint_name
+    WHERE 
       tc.constraint_type = 'FOREIGN KEY'
-      AND tc.table_name = TG_TABLE_NAME
+      AND ccu.table_name = TG_TABLE_NAME
   LOOP
 
   RAISE LOG 'Referencing table: %', row_to_json(referencing_table);
