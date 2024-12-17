@@ -9,6 +9,7 @@ AS $FUNCTION$
 DECLARE
   payload JSON;
   referencing_table RECORD;
+  referencing_query TEXT;
   affected_rows JSON;
   referenced_value TEXT;
 BEGIN
@@ -18,6 +19,9 @@ BEGIN
     payload := row_to_json(NEW);
   END IF;
 
+  EXECUTE FORMAT(
+    'SELECT ($1).id'
+  ) INTO referenced_value USING CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
 
   PERFORM pg_notify('new_event',
     json_build_object(
@@ -27,35 +31,35 @@ BEGIN
     )::text
   );
 
-  RAISE NOTICE 'Processing table: %', TG_TABLE_NAME;
+  RAISE LOG 'Referencing table: %', referenced_value;
+  RAISE LOG 'Processing table: %', TG_TABLE_NAME;
 
   FOR referencing_table IN 
     SELECT 
       tc.table_name AS referencing_table,
       kcu.column_name AS referencing_column,
+      ccu.table_name AS referenced_table,
       ccu.column_name AS referenced_column
-    FROM
+    FROM 
       information_schema.table_constraints AS tc
-      JOIN information_schema.key_column_usage as kcu
-      ON tc.constraint_name = kcu.constraint_name
-      JOIN information_schema.constraint_column_usage as ccu
-      ON ccu.constraint_name = tc.constraint_name
-    WHERE
+      JOIN information_schema.key_column_usage AS kcu
+        ON tc.constraint_name = kcu.constraint_name
+      JOIN information_schema.constraint_column_usage AS ccu
+        ON ccu.constraint_name = tc.constraint_name
+    WHERE 
       tc.constraint_type = 'FOREIGN KEY'
-      AND tc.table_name = TG_TABLE_NAME
-    LOOP
+      AND ccu.table_name = TG_TABLE_NAME
+  LOOP
 
-    EXECUTE FORMAT(
-      'SELECT ($1).%I',
-      referencing_table.referenced_column
-    ) INTO referenced_value USING CASE WHEN TG_OP = 'DELETE' THEN OLD ELSE NEW END;
+  RAISE LOG 'Referencing table: %', row_to_json(referencing_table);
 
-    EXECUTE format(
-      'SELECT json_agg(row_to_json(t)) FROM %I t where t.%I = $1',
+    referencing_query := FORMAT(
+      'SELECT json_agg(row_to_json(t)) FROM %I t WHERE t.%I = $1',
       referencing_table.referencing_table,
       referencing_table.referencing_column
-    ) INTO affected_rows
-    USING referenced_value;
+    );
+
+    EXECUTE referencing_query INTO affected_rows USING referenced_value;
 
     IF affected_rows IS NOT NULL THEN
       PERFORM pg_notify('new_event',
