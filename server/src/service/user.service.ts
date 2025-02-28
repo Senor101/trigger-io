@@ -1,5 +1,5 @@
-import { Prisma, PrismaClient } from '@prisma/client';
-import { Database as db } from '../config/database.confitg';
+import { Prisma } from '@prisma/client';
+import { Database as db } from '../config/database.config';
 
 export class UserService {
   static async getUsers() {

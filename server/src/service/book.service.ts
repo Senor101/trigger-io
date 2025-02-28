@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client';
-import { Database as db } from '../config/database.confitg';
+import { Database as db } from '../config/database.config';
 
 export class BookService {
   static async getBooks() {
