@@ -86,8 +86,8 @@ function Book() {
       const updatedbook = await response.json();
       setBooks((prev) =>
         prev.map((book) =>
-          book.id === currentbookId ? updatedbook.data : book
-        )
+          book.id === currentbookId ? updatedbook.data : book,
+        ),
       );
     }
 

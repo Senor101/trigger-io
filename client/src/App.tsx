@@ -1,5 +1,10 @@
 import './App.css';
-import { Link, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import {
+  NavLink,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from 'react-router-dom';
 import User from './pages/user';
 import Book from './pages/books';
 import { useEffect } from 'react';
@@ -16,19 +21,28 @@ function App() {
     <Router>
       <div className="p-4">
         {/* Navigation Bar */}
+
         <nav className="flex justify-end space-x-4 mb-4">
-          <Link
+          <NavLink
             to="/users"
-            className="text-slate-500 p-2 rounded hover:bg-slate-200 hover:text-slate-900 active:bg-slate-300"
+            className={({ isActive }) =>
+              isActive
+                ? 'text-slate-900 p-2 rounded bg-slate-300'
+                : 'text-slate-500 p-2 rounded hover:bg-slate-200 hover:text-slate-900 active:bg-slate-300'
+            }
           >
             Users
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/books"
-            className="text-slate-500 p-2 rounded hover:bg-slate-200 hover:text-slate-900 active:bg-slate-300"
+            className={({ isActive }) =>
+              isActive
+                ? 'text-slate-900 p-2 rounded bg-slate-300'
+                : 'text-slate-500 p-2 rounded hover:bg-slate-200 hover:text-slate-900 active:bg-slate-300'
+            }
           >
             Books
-          </Link>
+          </NavLink>
         </nav>
 
         {/* Page Routes */}
